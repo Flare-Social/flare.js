@@ -8,11 +8,11 @@ interface FlareApiResponse<T> {
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 export default class FlareApi {
-    private token: string;
-    private baseUrl: string;
+    static getToken: () => string;
+    private readonly baseUrl: string;
 
-    constructor(token: string, baseUrl: string = "https://api.tryflare.social") {
-        this.token = token;
+    constructor(getToken: () => string, baseUrl: string = "https://api.tryflare.social") {
+        FlareApi.getToken = getToken;
         this.baseUrl = baseUrl;
     }
 
@@ -22,7 +22,7 @@ export default class FlareApi {
         const response = await fetch(`${this.baseUrl}/${path}`, {
             method,
             headers: {
-                'Authorization': `Bearer ${this.token}`,
+                'Authorization': `Bearer ${FlareApi.getToken()}`,
                 ...(headers || {})
             },
             ...(init || {})
@@ -52,7 +52,7 @@ export default class FlareApi {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username, email, password, displayName })
+            body: JSON.stringify({ username, email, password, display_name: displayName })
         });
 
         const data: FlareApiResponse<{ token: string }> = await result.json();
