@@ -1,4 +1,4 @@
-# Flare.js
+# @flaresocial/api
 
 Flare Social API wrapper for javascript.
 
@@ -22,8 +22,7 @@ const token = FlareApi.login("usernameOrEmail", "password" /* baseUrl: string */
 const _token = FlareApi.register("username", "email", "password", "Display Name", /* baseUrl: string */); // Display Name is optional
 
 // create a new FlareApi instance:
-const flare = new FlareApi(token /* baseUrl: string */);
-
+const flare = new FlareApi(() => token /* baseUrl: string */);
 ```
 
 ## License
