@@ -29,6 +29,15 @@ const _token = FlareApi.register("username", "email", "password", "Display Name"
 
 // create a new FlareApi instance:
 const flare = new FlareApi(() => token /* baseUrl: string */);
+
+// get the user's profile
+const me = await flare.users.getMe();
+
+// get all users
+const users = await flare.users.getAll();
+
+// get a user by id
+const user = await flare.users.getById(me.id); // or any other user id
 ```
 
 ## License
