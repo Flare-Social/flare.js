@@ -6,7 +6,13 @@ Flare Social API wrapper for javascript.
 ## Installation
 
 ```bash
-npm install flare.js
+npm install --save @flaresocial/api
+# or
+yarn add @flaresocial/api
+# or
+pnpm add @flaresocial/api
+# or
+bun add @flaresocial/api
 ```
 
 ## Usage
