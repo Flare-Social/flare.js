@@ -1,8 +1,12 @@
 {
-  "name": "flare.js",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@flaresocial/api",
+  "version": "0.0.1",
+  "description": "API wrapper for the Flare Social API",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "build": "tsc"
   },
@@ -10,5 +14,18 @@
   "devDependencies": {
     "typescript": "^5.5.3"
   },
-  "private": true
+  "author": "Flare Contributors <support@tryflare.social>",
+  "license": "MIT",
+  "bugs": "https://github.com/Flare-Social/flare.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Flare-Social/flare.js"
+  }
+  "homepage": "https://tryflare.social",
+  "keywords": [
+    "flare",
+    "tryflare.social",
+    "flare.js",
+    "flare social"
+  ]
 }

@@ -13,6 +13,16 @@ npm install flare.js
 
 ```ts
 // Import the module
+import FlareApi from "@flaresocial/api";
+
+// get your token by creating an app, when for calling the api as a user account
+// you can get it by logging in or registering
+const token = FlareApi.login("usernameOrEmail", "password" /* baseUrl: string */);
+// or
+const _token = FlareApi.register("username", "email", "password", "Display Name", /* baseUrl: string */); // Display Name is optional
+
+// create a new FlareApi instance:
+const flare = new FlareApi(token /* baseUrl: string */);
 
 ```
 
