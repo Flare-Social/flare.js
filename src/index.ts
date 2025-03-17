@@ -1,3 +1,5 @@
+import { UsersEndpoint } from "./users";
+
 interface FlareApiResponse<T> {
     status: number;
     message?: string;
@@ -10,6 +12,8 @@ type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export default class FlareApi {
     static getToken: () => string;
     private readonly baseUrl: string;
+
+    readonly users = new UsersEndpoint(this);
 
     constructor(getToken: () => string, baseUrl: string = "https://api.tryflare.social") {
         FlareApi.getToken = getToken;
