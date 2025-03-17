@@ -1,4 +1,5 @@
 import { UsersEndpoint } from "./users";
+export { User } from "./users";
 
 interface FlareApiResponse<T> {
     status: number;

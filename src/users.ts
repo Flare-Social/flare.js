@@ -1,7 +1,7 @@
 import FlareApi from "./index";
 import { Endpoint, type GetAllEndpoint, type GetEndpoint, type IdHolder } from "./endpoint";
 
-type User = {
+export type User = {
   username: string;
   display_name: string;
 
