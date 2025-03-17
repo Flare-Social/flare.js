@@ -31,6 +31,10 @@ export class UsersEndpoint
       return await this.api.request('GET', `${this.path}/${id}`);
     }
 
+    async getByHandle(handle: string): Promise<User> {
+      return await this.api.request('GET', `${this.path}/by_handle/${handle}`);
+    }
+
     async getMe(): Promise<User> {
       return await this.api.request('GET', `${this.path}/me`);
     }
