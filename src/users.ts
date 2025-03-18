@@ -1,5 +1,7 @@
 import FlareApi from "./index";
 import { Endpoint, type GetAllEndpoint, type GetEndpoint, type IdHolder } from "./endpoint";
+import { Entity } from "./entity";
+import { createFormData } from "./utils";
 
 export type User = {
   username: string;
@@ -16,47 +18,77 @@ export type User = {
   created_at: string;
 } & IdHolder
 
+export class UserEntity extends Entity implements User {
+  id: string;
+  created_at: string;
+
+  username: string;
+  display_name: string;
+
+  bio?: string;
+  link?: string;
+  location?: string;
+  pronouns?: string;
+
+  avatar: string;
+  banner?: string;
+
+  constructor(api: FlareApi, data: User) {
+    super(api);
+
+    this.id = data.id;
+    this.created_at = data.created_at;
+
+    this.username = data.username;
+    this.display_name = data.display_name;
+
+    this.bio = data.bio;
+    this.location = data.location;
+    this.link = data.link;
+    this.pronouns = data.pronouns;
+
+    this.avatar = data.avatar;
+    this.banner = data.banner;
+  }
+
+  async getPosts() {
+    return await this.api.posts.getByAuthor(this.id);
+  }
+}
+
+export type UserUpdate = Partial<
+  Pick<User, 'display_name' | 'bio' | 'location' | 'link' | 'pronouns'> & {
+    avatar?: File;
+    banner?: File;
+  }
+>
+
 export class UsersEndpoint
-  extends Endpoint<User>
-  implements GetAllEndpoint<User>, GetEndpoint<User> {
+  extends Endpoint
+  implements GetAllEndpoint<UserEntity>, GetEndpoint<UserEntity> {
     constructor(flareApi: FlareApi) {
         super(flareApi, '/users');
     }
 
-    async getAll(): Promise<User[]> {
-      return await this.api.request('GET', this.path);
+    async getAll(): Promise<UserEntity[]> {
+      return (await this.api.request<User[]>('GET', this.path))
+        .map(it => new UserEntity(this.api, it));
     }
 
-    async getById(id: string): Promise<User> {
-      return await this.api.request('GET', `${this.path}/${id}`);
+    async getById(id: string): Promise<UserEntity> {
+      return new UserEntity(this.api, await this.api.request('GET', `${this.path}/${id}`));
     }
 
-    async getByHandle(handle: string): Promise<User> {
-      return await this.api.request('GET', `${this.path}/by_handle/${handle}`);
+    async getByHandle(handle: string): Promise<UserEntity> {
+      return new UserEntity(this.api, await this.api.request('GET', `${this.path}/by_handle/${handle}`));
     }
 
     async getMe(): Promise<User> {
-      return await this.api.request('GET', `${this.path}/me`);
+      return new UserEntity(this.api, await this.api.request('GET', `${this.path}/me`));
     }
 
-    async updateMe(
-      data: Partial<
-        Pick<User, 'display_name' | 'bio' | 'location' | 'link' | 'pronouns'> & {
-          avatar?: File;
-          banner?: File;
-        }
-      >
-    ): Promise<void> {
-      const formData = new FormData();
-
-      // todo: refactor this to be more dynamic
-      if (data.display_name) formData.set('display_name', data.display_name);
-      if (data.bio) formData.set('bio', data.bio);
-      if (data.location) formData.set('location', data.location);
-      if (data.link) formData.set('link', data.link);
-      if (data.pronouns) formData.set('pronouns', data.pronouns);
-      if (data.avatar) formData.set('avatar', data.avatar);
-      if (data.banner) formData.set('banner', data.banner);
+    async updateMe(data: UserUpdate): Promise<void> {
+      const formData = createFormData(data);
 
       await this.api.request(
         'PUT',

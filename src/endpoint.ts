@@ -4,7 +4,7 @@ export type IdHolder = {
   id: string;
 }
 
-export abstract class Endpoint<T extends IdHolder> {
+export abstract class Endpoint {
   constructor(protected api: FlareApi, protected path: string) {
 
   }

@@ -1,5 +1,8 @@
 import { UsersEndpoint } from "./users";
-export { User } from "./users";
+import { PostsEndpoint } from "./posts";
+
+export { User, UserEntity } from "./users";
+export { Post, PostEntity } from "./posts";
 
 interface FlareApiResponse<T> {
     status: number;
@@ -15,6 +18,7 @@ export default class FlareApi {
     private readonly baseUrl: string;
 
     readonly users = new UsersEndpoint(this);
+    readonly posts = new PostsEndpoint(this);
 
     constructor(getToken: () => string, baseUrl: string = "https://api.tryflare.social") {
         FlareApi.getToken = getToken;
