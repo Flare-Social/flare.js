@@ -41,7 +41,7 @@ export class PostsEndpoint
     return new PostEntity(this.api, await this.api.request<Post>('GET', `${this.path}/${id}`));
   }
 
-  async getByAuthor(authorId: string, limit: number = 20, page: number = 1): Promise<PostEntity[]> {
+  async getByAuthor(authorId: string, limit: number = 50, page: number = 0): Promise<PostEntity[]> {
     return (await this.api.request<Post[]>('GET', `${this.path}/by_author/${authorId}?limit=${limit}&page=${page}`))
       .map(it => new PostEntity(this.api, it));
   }

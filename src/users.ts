@@ -51,8 +51,8 @@ export class UserEntity extends Entity implements User {
     this.banner = data.banner;
   }
 
-  async getPosts() {
-    return await this.api.posts.getByAuthor(this.id);
+  async getPosts(limit: number = 50, page: number = 0) {
+    return await this.api.posts.getByAuthor(this.id, limit, page);
   }
 }
 
