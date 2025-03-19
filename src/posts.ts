@@ -1,4 +1,4 @@
-import { Endpoint, GetEndpoint, type IdHolder } from "./endpoint";
+import {Endpoint, GetAllEndpoint, GetEndpoint, type IdHolder} from "./endpoint";
 import FlareApi from "./index";
 import {Entity} from "./entity";
 
@@ -35,6 +35,11 @@ export class PostsEndpoint
 
   constructor(flareApi: FlareApi) {
     super(flareApi, '/posts');
+  }
+
+  async getAll(limit: number = 50, page: number = 0): Promise<PostEntity[]> {
+    const posts = await this.api.request<Post[]>('GET', `${this.path}?limit=${limit}&page=${page}`);
+    return posts.map(it => new PostEntity(this.api, it));
   }
 
   async getById(id: string): Promise<PostEntity> {

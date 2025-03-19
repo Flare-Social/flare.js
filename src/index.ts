@@ -22,7 +22,7 @@ export default class FlareApi {
 
     constructor(getToken: () => string, baseUrl: string = "https://api.tryflare.social") {
         FlareApi.getToken = getToken;
-        this.baseUrl = baseUrl;
+        this.baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
     }
 
     async request<T>(method: RequestMethod, path: string, headers?: Record<string, string>, init?: RequestInit): Promise<T> {
