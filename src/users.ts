@@ -83,7 +83,7 @@ export class UsersEndpoint
       return new UserEntity(this.api, await this.api.request('GET', `${this.path}/by_handle/${handle}`));
     }
 
-    async getMe(): Promise<User> {
+    async getMe(): Promise<UserEntity> {
       return new UserEntity(this.api, await this.api.request('GET', `${this.path}/me`));
     }
 
