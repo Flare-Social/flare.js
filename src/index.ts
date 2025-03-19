@@ -11,7 +11,7 @@ interface FlareApiResponse<T> {
     error?: string;
 }
 
-type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 export default class FlareApi {
     static getToken: () => string;

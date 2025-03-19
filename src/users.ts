@@ -91,11 +91,9 @@ export class UsersEndpoint
       const formData = createFormData(data);
 
       await this.api.request(
-        'PUT',
+        'PATCH',
         `${this.path}/me`,
-        { // headers
-          'Content-Type': 'multipart/form-data'
-        },
+        {}, // headers
         { body: formData }
       );
     }
