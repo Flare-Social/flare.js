@@ -21,6 +21,8 @@ export class PostEntity extends Entity implements Post {
   author_id: string;
   body: string;
 
+  createdAt: Date;
+
   constructor(api: FlareApi, data: Post) {
     super(api);
     this.id = data.id;
@@ -28,6 +30,8 @@ export class PostEntity extends Entity implements Post {
 
     this.author_id = data.author_id;
     this.body = data.body;
+
+    this.createdAt = new Date(data.created_at);
   }
 
   async getAuthor() {
@@ -35,7 +39,7 @@ export class PostEntity extends Entity implements Post {
   }
 }
 
-type PostCreate = Pick<Post, 'body'>;
+export type PostCreate = Pick<Post, 'body'>;
 
 export class PostsEndpoint
   extends Endpoint

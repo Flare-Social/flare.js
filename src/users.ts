@@ -38,6 +38,8 @@ export class UserEntity extends Entity implements User {
   avatar: string;
   banner?: string;
 
+  createdAt: Date;
+
   constructor(api: FlareApi, data: User) {
     super(api);
 
@@ -54,6 +56,8 @@ export class UserEntity extends Entity implements User {
 
     this.avatar = data.avatar;
     this.banner = data.banner;
+
+    this.createdAt = new Date(data.created_at);
   }
 
   async getPosts(limit: number = 50, page: number = 0) {
