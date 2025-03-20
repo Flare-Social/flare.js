@@ -1,6 +1,6 @@
 {
   "name": "@flaresocial/api",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "API wrapper for the Flare Social API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,6 +17,7 @@
     "@eslint/js": "^9.22.0",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",
+    "globals": "^16.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
     "prettier": "3.5.3",
@@ -38,8 +39,8 @@
     "flare social"
   ],
   "lint-staged": {
-    "*.js": "eslint --cache --fix",
-    "*.{js,css,md}": "prettier --write"
+    "*.ts": "eslint --cache --fix",
+    "*.{ts,css,md}": "prettier --write"
   },
   "packageManager": "pnpm@9.13.2+sha512.88c9c3864450350e65a33587ab801acf946d7c814ed1134da4a924f6df5a2120fd36b46aab68f7cd1d413149112d53c7db3a4136624cfd00ff1846a0c6cef48a"
 }

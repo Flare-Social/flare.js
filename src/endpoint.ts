@@ -1,13 +1,14 @@
-import FlareApi from "./index";
+import type FlareApi from './index';
 
 export type IdHolder = {
   id: string;
-}
+};
 
 export abstract class Endpoint {
-  constructor(protected api: FlareApi, protected path: string) {
-
-  }
+  constructor(
+    protected api: FlareApi,
+    protected path: string,
+  ) {}
 }
 
 export interface GetAllEndpoint<T extends IdHolder> {

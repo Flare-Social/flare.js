@@ -1,7 +1,12 @@
-import FlareApi from "./index";
-import { Endpoint, type GetAllEndpoint, type GetEndpoint, type IdHolder } from "./endpoint";
-import { Entity } from "./entity";
-import { createFormData } from "./utils";
+import type FlareApi from './index';
+import {
+  Endpoint,
+  type GetAllEndpoint,
+  type GetEndpoint,
+  type IdHolder,
+} from './endpoint';
+import { Entity } from './entity';
+import { createFormData } from './utils';
 
 export type User = {
   username: string;
@@ -16,7 +21,7 @@ export type User = {
   banner?: string;
 
   created_at: string;
-} & IdHolder
+} & IdHolder;
 
 export class UserEntity extends Entity implements User {
   id: string;
@@ -61,40 +66,51 @@ export type UserUpdate = Partial<
     avatar?: File;
     banner?: File;
   }
->
+>;
 
 export class UsersEndpoint
   extends Endpoint
-  implements GetAllEndpoint<UserEntity>, GetEndpoint<UserEntity> {
-    constructor(flareApi: FlareApi) {
-        super(flareApi, '/users');
-    }
+  implements GetAllEndpoint<UserEntity>, GetEndpoint<UserEntity>
+{
+  constructor(flareApi: FlareApi) {
+    super(flareApi, '/users');
+  }
 
-    async getAll(): Promise<UserEntity[]> {
-      return (await this.api.request<User[]>('GET', this.path))
-        .map(it => new UserEntity(this.api, it));
-    }
+  async getAll(): Promise<UserEntity[]> {
+    return (await this.api.request<User[]>('GET', this.path)).map(
+      (it) => new UserEntity(this.api, it),
+    );
+  }
 
-    async getById(id: string): Promise<UserEntity> {
-      return new UserEntity(this.api, await this.api.request('GET', `${this.path}/${id}`));
-    }
+  async getById(id: string): Promise<UserEntity> {
+    return new UserEntity(
+      this.api,
+      await this.api.request('GET', `${this.path}/${id}`),
+    );
+  }
 
-    async getByHandle(handle: string): Promise<UserEntity> {
-      return new UserEntity(this.api, await this.api.request('GET', `${this.path}/by_handle/${handle}`));
-    }
+  async getByHandle(handle: string): Promise<UserEntity> {
+    return new UserEntity(
+      this.api,
+      await this.api.request('GET', `${this.path}/by_handle/${handle}`),
+    );
+  }
 
-    async getMe(): Promise<UserEntity> {
-      return new UserEntity(this.api, await this.api.request('GET', `${this.path}/me`));
-    }
+  async getMe(): Promise<UserEntity> {
+    return new UserEntity(
+      this.api,
+      await this.api.request('GET', `${this.path}/me`),
+    );
+  }
 
-    async updateMe(data: UserUpdate): Promise<void> {
-      const formData = createFormData(data);
+  async updateMe(data: UserUpdate): Promise<void> {
+    const formData = createFormData(data);
 
-      await this.api.request(
-        'PATCH',
-        `${this.path}/me`,
-        {}, // headers
-        { body: formData }
-      );
-    }
+    await this.api.request(
+      'PATCH',
+      `${this.path}/me`,
+      {}, // headers
+      { body: formData },
+    );
+  }
 }

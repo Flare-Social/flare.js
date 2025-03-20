@@ -1,99 +1,114 @@
-import { UsersEndpoint } from "./users";
-import { PostsEndpoint } from "./posts";
+import { UsersEndpoint } from './users';
+import { PostsEndpoint } from './posts';
 
-export { User, UserEntity } from "./users";
-export { Post, PostEntity } from "./posts";
+export type { User } from './users';
+export { UserEntity } from './users';
+export type { Post } from './posts';
+export { PostEntity } from './posts';
 
 interface FlareApiResponse<T> {
-    status: number;
-    message?: string;
-    data?: T;
-    error?: string;
+  status: number;
+  message?: string;
+  data?: T;
+  error?: string;
 }
 
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 export default class FlareApi {
-    static getToken: () => string;
-    private readonly baseUrl: string;
+  static getToken: () => string;
+  private readonly baseUrl: string;
 
-    readonly users = new UsersEndpoint(this);
-    readonly posts = new PostsEndpoint(this);
+  readonly users = new UsersEndpoint(this);
+  readonly posts = new PostsEndpoint(this);
 
-    constructor(getToken: () => string, baseUrl: string = "https://api.tryflare.social") {
-        FlareApi.getToken = getToken;
-        this.baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  constructor(
+    getToken: () => string,
+    baseUrl: string = 'https://api.tryflare.social',
+  ) {
+    FlareApi.getToken = getToken;
+    this.baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  }
+
+  async request<T>(
+    method: RequestMethod,
+    path: string,
+    headers?: Record<string, string>,
+    init?: RequestInit,
+  ): Promise<T> {
+    console.log(`[${method}] ${this.baseUrl}/${path}`);
+
+    const response = await fetch(`${this.baseUrl}/${path}`, {
+      method,
+      headers: {
+        Authorization: `Bearer ${FlareApi.getToken()}`,
+        ...(headers || {}),
+      },
+      ...(init || {}),
+    });
+
+    const data: FlareApiResponse<T> = await response.json();
+
+    if (!response.ok || data.status !== 200) {
+      console.error(`Request failed: ${data.error}`);
+      throw new Error(data.error);
     }
 
-    async request<T>(method: RequestMethod, path: string, headers?: Record<string, string>, init?: RequestInit): Promise<T> {
-        console.log(`[${method}] ${this.baseUrl}/${path}`);
+    console.log(`Request status: ${data.status}`);
 
-        const response = await fetch(`${this.baseUrl}/${path}`, {
-            method,
-            headers: {
-                'Authorization': `Bearer ${FlareApi.getToken()}`,
-                ...(headers || {})
-            },
-            ...(init || {})
-        });
+    return data.data!;
+  }
 
-        const data: FlareApiResponse<T> = await response.json();
+  static async register(
+    username: string,
+    email: string,
+    password: string,
+    displayName?: string,
+    baseUrl: string = 'https://api.tryflare.social',
+  ): Promise<string> {
+    const result = await fetch(`${baseUrl}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        email,
+        password,
+        display_name: displayName,
+      }),
+    });
 
-        if (!response.ok || data.status !== 200) {
-            console.error(`Request failed: ${data.error}`);
-            throw new Error(data.error)
-        }
+    const data: FlareApiResponse<{ token: string }> = await result.json();
 
-        console.log(`Request status: ${data.status}`);
-
-        return data.data!;
+    if (!result.ok || data.status !== 200) {
+      console.error(`Login failed: ${data.error}`);
+      throw new Error(data.error);
     }
 
-    static async register(
-        username: string,
-        email: string,
-        password: string,
-        displayName?: string,
-        baseUrl: string = "https://api.tryflare.social"
-    ): Promise<string> {
-        const result = await fetch(`${baseUrl}/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, email, password, display_name: displayName })
-        });
+    return data.data!.token;
+  }
 
-        const data: FlareApiResponse<{ token: string }> = await result.json();
+  static async login(
+    login: string,
+    password: string,
+    baseUrl: string = 'https://api.tryflare.social',
+  ): Promise<string> {
+    const result = await fetch(`${baseUrl}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ login, password }),
+    });
 
-        if (!result.ok || data.status !== 200) {
-            console.error(`Login failed: ${data.error}`);
-            throw new Error(data.error);
-        }
+    const data: FlareApiResponse<{ token: string }> = await result.json();
 
-        return data.data!.token;
+    if (!result.ok || data.status !== 200) {
+      console.error(`Login failed: ${data.error}`);
+      throw new Error(data.error);
     }
 
-    static async login(
-        login: string,
-        password: string,
-        baseUrl: string = "https://api.tryflare.social"
-    ): Promise<string> {
-        const result = await fetch(`${baseUrl}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ login, password })
-        });
-
-        const data: FlareApiResponse<{ token: string }> = await result.json();
-
-        if (!result.ok || data.status !== 200) {
-            console.error(`Login failed: ${data.error}`);
-            throw new Error(data.error);
-        }
-
-        return data.data!.token;
-    }
+    return data.data!.token;
+  }
 }

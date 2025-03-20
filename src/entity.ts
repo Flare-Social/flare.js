@@ -1,4 +1,4 @@
-import FlareApi from "./index";
+import type FlareApi from './index';
 
 export abstract class Entity {
   public abstract id: string;
