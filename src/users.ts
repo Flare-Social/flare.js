@@ -20,6 +20,11 @@ export type User = {
   avatar: string;
   banner?: string;
 
+  admin: boolean;
+
+  follower_count: number;
+  following_count: number;
+
   created_at: string;
 } & IdHolder;
 
@@ -37,6 +42,11 @@ export class UserEntity extends Entity implements User {
 
   avatar: string;
   banner?: string;
+
+  admin: boolean;
+
+  follower_count: number;
+  following_count: number;
 
   createdAt: Date;
 
@@ -57,11 +67,48 @@ export class UserEntity extends Entity implements User {
     this.avatar = data.avatar;
     this.banner = data.banner;
 
+    this.admin = data.admin;
+
+    this.follower_count = data.follower_count;
+    this.following_count = data.following_count;
+
     this.createdAt = new Date(data.created_at);
   }
 
   async getPosts(limit: number = 50, page: number = 0) {
     return await this.api.posts.getByAuthor(this.id, limit, page);
+  }
+
+  async getFollowers() {
+    const followers = await this.api.request<User[]>(
+      'GET',
+      `/users/${this.id}/followers`,
+    );
+    return followers.map((it) => new UserEntity(this.api, it));
+  }
+
+  async getFollowing() {
+    const following = await this.api.request<User[]>(
+      'GET',
+      `/users/${this.id}/following`,
+    );
+    return following.map((it) => new UserEntity(this.api, it));
+  }
+
+  async follow(): Promise<boolean> {
+    const response = await this.api.request<{ success: boolean }>(
+      'PUT',
+      `/users/${this.id}/follow`,
+    );
+    return response.success;
+  }
+
+  async unfollow(): Promise<boolean> {
+    const response = await this.api.request<{ success: boolean }>(
+      'DELETE',
+      `/users/${this.id}/follow`,
+    );
+    return response.success;
   }
 }
 
@@ -100,6 +147,8 @@ export class UsersEndpoint
     );
   }
 
+  // Self-related methods
+
   async getMe(): Promise<UserEntity> {
     return new UserEntity(
       this.api,
@@ -116,5 +165,13 @@ export class UsersEndpoint
       {}, // headers
       { body: formData },
     );
+  }
+
+  async removeFollower(id: string): Promise<boolean> {
+    const response = await this.api.request<{ success: boolean }>(
+      'DELETE',
+      `/users/me/followers/${id}`,
+    );
+    return response.success;
   }
 }
