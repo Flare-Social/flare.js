@@ -37,6 +37,10 @@ export class PostEntity extends Entity implements Post {
   async getAuthor() {
     return await this.api.users.getById(this.author_id);
   }
+
+  async delete() {
+    return await this.api.posts.delete(this.id);
+  }
 }
 
 export type PostCreate = Pick<Post, 'body'>;
@@ -91,5 +95,14 @@ export class PostsEndpoint
         },
       ),
     );
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const res = await this.api.request<{ success: boolean }>(
+      'DELETE',
+      `${this.path}/${id}`,
+    );
+
+    return res.success;
   }
 }
