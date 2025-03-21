@@ -1,3 +1,4 @@
+import type { PaginatedResponse } from './endpoint';
 import {
   type CreateEndpoint,
   Endpoint,
@@ -53,12 +54,19 @@ export class PostsEndpoint
     super(flareApi, '/posts');
   }
 
-  async getAll(limit: number = 50, page: number = 0): Promise<PostEntity[]> {
-    const posts = await this.api.request<Post[]>(
+  async getAll(
+    limit: number = 50,
+    page: number = 0,
+  ): Promise<PaginatedResponse<PostEntity>> {
+    const res = await this.api.request<PaginatedResponse<PostEntity>>(
       'GET',
       `${this.path}?limit=${limit}&page=${page}`,
     );
-    return posts.map((it) => new PostEntity(this.api, it));
+
+    return {
+      data: res.data.map((it) => new PostEntity(this.api, it)),
+      nextPage: res.nextPage,
+    };
   }
 
   async getById(id: string): Promise<PostEntity> {
@@ -72,13 +80,16 @@ export class PostsEndpoint
     authorId: string,
     limit: number = 50,
     page: number = 0,
-  ): Promise<PostEntity[]> {
-    return (
-      await this.api.request<Post[]>(
-        'GET',
-        `${this.path}/by_author/${authorId}?limit=${limit}&page=${page}`,
-      )
-    ).map((it) => new PostEntity(this.api, it));
+  ): Promise<PaginatedResponse<PostEntity>> {
+    const res = await this.api.request<PaginatedResponse<Post>>(
+      'GET',
+      `${this.path}/by_author/${authorId}?limit=${limit}&page=${page}`,
+    );
+
+    return {
+      data: res.data.map((it) => new PostEntity(this.api, it)),
+      nextPage: res.nextPage,
+    };
   }
 
   async create(data: PostCreate): Promise<PostEntity> {

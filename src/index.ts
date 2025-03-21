@@ -1,6 +1,7 @@
 import { UsersEndpoint } from './users';
 import { PostsEndpoint } from './posts';
 
+export type { IdHolder, PaginatedResponse } from './endpoint';
 export type { User, UserUpdate } from './users';
 export { UserEntity } from './users';
 export type { Post, PostCreate } from './posts';

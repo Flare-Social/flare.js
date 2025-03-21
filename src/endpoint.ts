@@ -4,6 +4,11 @@ export type IdHolder = {
   id: string;
 };
 
+export type PaginatedResponse<T> = {
+  data: T[];
+  nextPage?: string;
+};
+
 export abstract class Endpoint {
   constructor(
     protected api: FlareApi,
