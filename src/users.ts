@@ -24,6 +24,7 @@ export type User = {
 
   follower_count: number;
   following_count: number;
+  post_count: number;
 
   created_at: string;
 } & IdHolder;
@@ -47,6 +48,7 @@ export class UserEntity extends Entity implements User {
 
   follower_count: number;
   following_count: number;
+  post_count: number;
 
   createdAt: Date;
 
@@ -71,6 +73,7 @@ export class UserEntity extends Entity implements User {
 
     this.follower_count = data.follower_count;
     this.following_count = data.following_count;
+    this.post_count = data.post_count;
 
     this.createdAt = new Date(data.created_at);
   }
