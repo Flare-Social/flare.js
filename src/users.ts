@@ -1,4 +1,5 @@
 import type FlareApi from './index';
+import type { PaginatedResponse } from './index';
 import {
   Endpoint,
   type GetAllEndpoint,
@@ -82,20 +83,28 @@ export class UserEntity extends Entity implements User {
     return await this.api.posts.getByAuthor(this.id, limit, page);
   }
 
-  async getFollowers() {
-    const followers = await this.api.request<User[]>(
+  async getFollowers(): Promise<PaginatedResponse<UserEntity>> {
+    const followers = await this.api.request<PaginatedResponse<User>>(
       'GET',
       `/users/${this.id}/followers`,
     );
-    return followers.map((it) => new UserEntity(this.api, it));
+
+    return {
+      data: followers.data.map((it) => new UserEntity(this.api, it)),
+      nextPage: followers.nextPage,
+    };
   }
 
-  async getFollowing() {
-    const following = await this.api.request<User[]>(
+  async getFollowing(): Promise<PaginatedResponse<UserEntity>> {
+    const following = await this.api.request<PaginatedResponse<User>>(
       'GET',
       `/users/${this.id}/following`,
     );
-    return following.map((it) => new UserEntity(this.api, it));
+
+    return {
+      data: following.data.map((it) => new UserEntity(this.api, it)),
+      nextPage: following.nextPage,
+    };
   }
 
   async follow(): Promise<boolean> {
