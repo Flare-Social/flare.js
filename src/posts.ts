@@ -5,33 +5,43 @@ import {
   type GetEndpoint,
   type IdHolder,
 } from './endpoint';
+import type { User } from './index';
 import type FlareApi from './index';
+import { UserEntity } from './index';
 import { Entity } from './entity';
 import { createFormData } from './utils';
 
 export type Post = {
   author_id: string;
   body: string;
+
+  like_count: number;
+
   created_at: string;
 } & IdHolder;
 
 export class PostEntity extends Entity implements Post {
   id: string;
-  created_at: string;
-
   author_id: string;
+
   body: string;
+
+  like_count: number;
+
+  created_at: string;
 
   createdAt: Date;
 
   constructor(api: FlareApi, data: Post) {
     super(api);
     this.id = data.id;
-    this.created_at = data.created_at;
-
     this.author_id = data.author_id;
+
     this.body = data.body;
 
+    this.like_count = data.like_count;
+
+    this.created_at = data.created_at;
     this.createdAt = new Date(data.created_at);
   }
 
@@ -41,6 +51,45 @@ export class PostEntity extends Entity implements Post {
 
   async delete() {
     return await this.api.posts.delete(this.id);
+  }
+
+  async like() {
+    const res = await this.api.request<{ success: boolean }>(
+      'PUT',
+      `/posts/${this.id}/like`,
+    );
+
+    return res.success;
+  }
+
+  async unlike() {
+    const res = await this.api.request<{ success: boolean }>(
+      'DELETE',
+      `/posts/${this.id}/like`,
+    );
+
+    return res.success;
+  }
+
+  async isLiked(): Promise<boolean> {
+    const res = await this.api.request<{ liked: boolean }>(
+      'GET',
+      `/posts/${this.id}/like`,
+    );
+
+    return res.liked;
+  }
+
+  async getLikes(): Promise<PaginatedResponse<UserEntity>> {
+    const res = await this.api.request<PaginatedResponse<User>>(
+      'GET',
+      `/posts/${this.id}/likes`,
+    );
+
+    return {
+      data: res.data.map((it) => new UserEntity(this.api, it)),
+      nextPage: res.nextPage,
+    };
   }
 }
 
