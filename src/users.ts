@@ -122,6 +122,10 @@ export class UserEntity extends Entity implements User {
     );
     return response.success;
   }
+
+  async following(): Promise<boolean> {
+    return await this.api.users.isFollowing(this);
+  }
 }
 
 export type UserUpdate = Partial<
@@ -185,5 +189,16 @@ export class UsersEndpoint
       `/users/me/followers/${id}`,
     );
     return response.success;
+  }
+
+  async isFollowing(user: string | UserEntity): Promise<boolean> {
+    const userId = typeof user === 'string' ? user : user.id;
+
+    const response = await this.api.request<{ following: boolean }>(
+      'GET',
+      `/users/${userId}/follow`,
+    );
+
+    return response.following;
   }
 }
