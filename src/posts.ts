@@ -16,6 +16,7 @@ export type Post = {
   body: string;
 
   like_count: number;
+  bookmark_count: number;
 
   created_at: string;
 } & IdHolder;
@@ -27,9 +28,9 @@ export class PostEntity extends Entity implements Post {
   body: string;
 
   like_count: number;
+  bookmark_count: number;
 
   created_at: string;
-
   createdAt: Date;
 
   constructor(api: FlareApi, data: Post) {
@@ -40,6 +41,7 @@ export class PostEntity extends Entity implements Post {
     this.body = data.body;
 
     this.like_count = data.like_count;
+    this.bookmark_count = data.bookmark_count;
 
     this.created_at = data.created_at;
     this.createdAt = new Date(data.created_at);
@@ -90,6 +92,33 @@ export class PostEntity extends Entity implements Post {
       data: res.data.map((it) => new UserEntity(this.api, it)),
       nextPage: res.nextPage,
     };
+  }
+
+  async bookmark() {
+    const res = await this.api.request<{ success: boolean }>(
+      'PUT',
+      `/posts/${this.id}/bookmark`,
+    );
+
+    return res.success;
+  }
+
+  async unbookmark() {
+    const res = await this.api.request<{ success: boolean }>(
+      'DELETE',
+      `/posts/${this.id}/bookmark`,
+    );
+
+    return res.success;
+  }
+
+  async isBookmarked(): Promise<boolean> {
+    const res = await this.api.request<{ bookmarked: boolean }>(
+      'GET',
+      `/posts/${this.id}/bookmark`,
+    );
+
+    return res.bookmarked;
   }
 }
 
@@ -164,5 +193,20 @@ export class PostsEndpoint
     );
 
     return res.success;
+  }
+
+  async getMyBookmarks(
+    limit: number = 50,
+    page: number = 0,
+  ): Promise<PaginatedResponse<PostEntity>> {
+    const res = await this.api.request<PaginatedResponse<Post>>(
+      'GET',
+      `/users/me/bookmarks?limit=${limit}&page=${page}`,
+    );
+
+    return {
+      data: res.data.map((it) => new PostEntity(this.api, it)),
+      nextPage: res.nextPage,
+    };
   }
 }
