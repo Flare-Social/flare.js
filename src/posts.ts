@@ -13,8 +13,14 @@ import { createFormData } from './utils';
 
 export type Post = {
   author_id: string;
+
   body: string;
 
+  reply_to?: string;
+  repost_of?: string;
+
+  reply_count: number;
+  repost_count: number;
   like_count: number;
   bookmark_count: number;
 
@@ -27,6 +33,11 @@ export class PostEntity extends Entity implements Post {
 
   body: string;
 
+  reply_to?: string;
+  repost_of?: string;
+
+  reply_count: number;
+  repost_count: number;
   like_count: number;
   bookmark_count: number;
 
@@ -40,6 +51,11 @@ export class PostEntity extends Entity implements Post {
 
     this.body = data.body;
 
+    this.reply_to = data.reply_to;
+    this.repost_of = data.repost_of;
+
+    this.reply_count = data.reply_count;
+    this.repost_count = data.repost_count;
     this.like_count = data.like_count;
     this.bookmark_count = data.bookmark_count;
 
@@ -120,9 +136,108 @@ export class PostEntity extends Entity implements Post {
 
     return res.bookmarked;
   }
+
+  async getReplies(
+    limit: number = 50,
+    page: number = 0,
+  ): Promise<PaginatedResponse<PostEntity>> {
+    const res = await this.api.request<PaginatedResponse<Post>>(
+      'GET',
+      `/posts/${this.id}/replies?limit=${limit}&page=${page}`,
+    );
+
+    return {
+      data: res.data.map((it) => new PostEntity(this.api, it)),
+      nextPage: res.nextPage,
+    };
+  }
+
+  async reply(data: PostCreateBase) {
+    const newData: PostCreate = {
+      ...data,
+      reply_to: this.id,
+    };
+
+    return await this.api.posts.create(newData);
+  }
+
+  async getReposters(
+    limit: number = 50,
+    page: number = 0,
+  ): Promise<PaginatedResponse<UserEntity>> {
+    const res = await this.api.request<PaginatedResponse<User>>(
+      'GET',
+      `/posts/${this.id}/reposters?limit=${limit}&page=${page}`,
+    );
+
+    return {
+      data: res.data.map((it) => new UserEntity(this.api, it)),
+      nextPage: res.nextPage,
+    };
+  }
+
+  async repost() {
+    const res = await this.api.request<{ success: boolean }>(
+      'PUT',
+      `/posts/${this.id}/repost`,
+    );
+
+    return res.success;
+  }
+
+  async unrepost() {
+    const res = await this.api.request<{ success: boolean }>(
+      'DELETE',
+      `/posts/${this.id}/repost`,
+    );
+
+    return res.success;
+  }
+
+  async isReposted(): Promise<boolean> {
+    const res = await this.api.request<{ reposted: boolean }>(
+      'GET',
+      `/posts/${this.id}/repost`,
+    );
+
+    return res.reposted;
+  }
+
+  async getQuotes(
+    limit: number = 50,
+    page: number = 0,
+  ): Promise<PaginatedResponse<PostEntity>> {
+    const res = await this.api.request<PaginatedResponse<Post>>(
+      'GET',
+      `/posts/${this.id}/quotes?limit=${limit}&page=${page}`,
+    );
+
+    return {
+      data: res.data.map((it) => new PostEntity(this.api, it)),
+      nextPage: res.nextPage,
+    };
+  }
+
+  async quote(data: QuoteCreate) {
+    const formData = createFormData(data);
+
+    return new PostEntity(
+      this.api,
+      await this.api.request<Post>(
+        'POST',
+        `/posts/${this.id}/quote`,
+        {},
+        {
+          body: formData,
+        },
+      ),
+    );
+  }
 }
 
-export type PostCreate = Pick<Post, 'body'>;
+type PostCreateBase = Pick<Post, 'body'>;
+export type PostCreate = PostCreateBase & Pick<Post, 'reply_to'>;
+export type QuoteCreate = PostCreateBase;
 
 export class PostsEndpoint
   extends Endpoint
