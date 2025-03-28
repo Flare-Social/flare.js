@@ -98,10 +98,13 @@ export class PostEntity extends Entity implements Post {
     return res.liked;
   }
 
-  async getLikes(): Promise<PaginatedResponse<UserEntity>> {
+  async getLikes(
+    limit: number = 50,
+    page: number = 0,
+  ): Promise<PaginatedResponse<UserEntity>> {
     const res = await this.api.request<PaginatedResponse<User>>(
       'GET',
-      `/posts/${this.id}/likes`,
+      `/posts/${this.id}/likes?limit=${limit}&page=${page}`,
     );
 
     return {
