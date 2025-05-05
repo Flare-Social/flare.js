@@ -66,6 +66,7 @@ export default class FlareApi {
     password: string,
     displayName?: string,
     baseUrl: string = 'https://api.tryflare.social',
+    invite_code?: string,
   ): Promise<string> {
     const result = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
@@ -77,6 +78,7 @@ export default class FlareApi {
         email,
         password,
         display_name: displayName,
+        invite_code,
       }),
     });
 
