@@ -1,6 +1,6 @@
 {
   "name": "@flaresocial/api",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "description": "API wrapper for the Flare Social API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
